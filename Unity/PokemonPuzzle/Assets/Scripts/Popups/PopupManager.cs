@@ -5,7 +5,8 @@ using UnityEngine;
 public enum EPopupTypes
 {
     None,
-    SingleTextSingleOption
+    SingleTextSingleOption,
+    ViewProfile
 }
 
 //Parent class for popup data

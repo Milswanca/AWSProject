@@ -72,6 +72,7 @@ public class DatabaseHandler : MonoBehaviour
         Username = "";
         Password = "";
         LoggedIn = false;
+        cachedProfileInfo = null;
     }
 
     private void OnLoggedIn(bool _success, ErrorResult _errorMessage)
@@ -121,17 +122,19 @@ public class DatabaseHandler : MonoBehaviour
         if(cachedProfileInfo != null)
         {
             _finishedEvent(true, null, cachedProfileInfo);
+            return;
         }
 
         GetProfileInfo(Username, _finishedEvent);
     }
 
-    public void UpdateProfileInto(string _greeting, int _displayPic, SuccessFailReturn _finishedEvent)
+    public void UpdateProfileInfo(string _greeting, int _displayPic, SuccessFailReturn _finishedEvent)
     {
         string url = UpdateProfileURL + "Username=" + WWW.EscapeURL(Username) + "&Password=" + Password + "&Greeting=" + _greeting + "&DisplayPic=" + _displayPic;
         AddHashToURL(ref url, Username + Password + _greeting + _displayPic);
 
         pendingProfileInfo = new NameValueCollection();
+        pendingProfileInfo.Add("Username", Username);
         pendingProfileInfo.Add("Greeting", _greeting);
         pendingProfileInfo.Add("DisplayPic", _displayPic.ToString());
 
@@ -171,6 +174,8 @@ public class DatabaseHandler : MonoBehaviour
             //Call the callbacks
             foreach (SuccessFailReturn i in _finishedEvents)
             {
+                if(i == null) { continue; }
+
                 i((error == null) ? true : false, error);
             }
         }

@@ -42,6 +42,11 @@ public class MasterManager : MonoBehaviour {
     private BlockEventData blockEvents = null;
     public BlockEventData BlockEvents { get { return blockEvents; } private set { blockEvents = value; } }
 
+    [SerializeField]
+    private string gameGlobalsAsset = "";
+    private GameGlobals gameGlobals = null;
+    public GameGlobals GameGlobals { get { return gameGlobals; } private set { gameGlobals = value; } }
+
     public EGameState GameState { get; private set; }
 
     public static MasterManager instance {get; private set;}
@@ -57,6 +62,7 @@ public class MasterManager : MonoBehaviour {
 
         BlockTypes = Resources.Load<BlockTypes>(blockTypesAsset);
 		BlockEvents = Resources.Load<BlockEventData>(blockEventAsset);
+        GameGlobals = Resources.Load<GameGlobals>(gameGlobalsAsset);
     }
 
 	// Use this for initialization
@@ -68,6 +74,11 @@ public class MasterManager : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public Sprite GetProfileSprite(int _sprite)
+    {
+        return GameGlobals.possibleDisplayPics[_sprite];
+    }
 
     public void ChangeGameState(EGameState _state)
     {
