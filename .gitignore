@@ -1,9 +1,9 @@
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/Assets/AssetStoreTools*
+/Unity/PokemonPuzzle/[Ll]ibrary/
+/Unity/PokemonPuzzle/[Tt]emp/
+/Unity/PokemonPuzzle/[Oo]bj/
+/Unity/PokemonPuzzle/[Bb]uild/
+/Unity/PokemonPuzzle/[Bb]uilds/
+/Unity/PokemonPuzzle/Assets/AssetStoreTools*
 
 # Visual Studio 2015 cache directory
 /.vs/
