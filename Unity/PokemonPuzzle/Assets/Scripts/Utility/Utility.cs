@@ -20,4 +20,12 @@ public static class Utility
 
         return outVal;
     }
+
+    public static void DeleteChildren(this GameObject _obj)
+    {
+        foreach (Transform child in _obj.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
 }

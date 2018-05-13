@@ -7,7 +7,8 @@ public class PanelManager : MonoBehaviour
     [SerializeField]
     EGameScreens defaultScreen = EGameScreens.GS_MainEntry;
 
-    public UIPanel CurrentScreen { get; private set; }
+    public UIPanel CurrentScreen { get { return panelStack.Peek(); } }
+    private Stack<UIPanel> panelStack;
 
     private Dictionary<EGameScreens, UIPanel> screenMap;
 
@@ -19,6 +20,7 @@ public class PanelManager : MonoBehaviour
     private void Awake()
     {
         screenMap = new Dictionary<EGameScreens, UIPanel>();
+        panelStack = new Stack<UIPanel>();
     }
 
     private void Start()
@@ -26,21 +28,39 @@ public class PanelManager : MonoBehaviour
         ChangePanels(defaultScreen);
     }
 
-    public void ChangePanels(EGameScreens _panel)
+    public void ShowPanel(EGameScreens _panel)
     {
-        if(CurrentScreen)
-        {
-            CurrentScreen.gameObject.SetActive(false);
-            CurrentScreen.Deactivate();
-        }
-
-        CurrentScreen = GetScreen(_panel);
+        panelStack.Push(screenMap[_panel]);
 
         if (CurrentScreen)
         {
             CurrentScreen.gameObject.SetActive(true);
             CurrentScreen.Activate();
         }
+    }
+
+    public void HideTopPanel()
+    {
+        if (panelStack.Count > 0)
+        {
+            UIPanel top = panelStack.Pop();
+            top.gameObject.SetActive(false);
+            top.Deactivate();
+        }
+    }
+
+    public void CloseAllPanels()
+    {
+        while (panelStack.Count > 0)
+        {
+            HideTopPanel();
+        }
+    }
+
+    public void ChangePanels(EGameScreens _panel)
+    {
+        CloseAllPanels();
+        ShowPanel(_panel);
     }
 
     public void RegisterPanel(UIPanel _panel)

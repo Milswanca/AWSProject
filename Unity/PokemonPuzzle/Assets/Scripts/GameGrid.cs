@@ -25,6 +25,9 @@ public class GameGrid : MonoBehaviour
 	[SerializeField]
 	GameSelector gameSelector = null;
 
+    [SerializeField]
+    Transform BlocksRoot = null;
+
     private UIGame uiGame = null;
 
     public static GameGrid Get()
@@ -60,17 +63,16 @@ public class GameGrid : MonoBehaviour
 		playGrid = new GameBlock[width * height];
 		dirtyBlocks = new List<GameBlock>();
 		blocksInChain = new List<GameBlock>();
-	}
 
-	// Use this for initialization
-	void Start()
-	{
-		defaultGameBlocks = new GameBlock[numberOfDifferentBlocks];
-		System.Array.Copy(MasterManager.instance.BlockTypes.defaultBlockPrefabs, defaultGameBlocks, numberOfDifferentBlocks);
-		gameSelector.Index = width;
-		PlaceStartingBlocks();
-
+        defaultGameBlocks = new GameBlock[numberOfDifferentBlocks];
+        System.Array.Copy(MasterManager.instance.BlockTypes.defaultBlockPrefabs, defaultGameBlocks, numberOfDifferentBlocks);
         uiGame = PanelManager.Get().GetScreen(EGameScreens.GS_Game).GetComponent<UIGame>();
+    }
+
+    // Use this for initialization
+    void OnEnable()
+	{
+        Reset();
     }
 
 	private void Update()
@@ -118,6 +120,7 @@ public class GameGrid : MonoBehaviour
 				if(i / width >= height - 2)
 				{
 					GameOver();
+                    return;
 				}
 
 				SwapIndex(i, i + width);
@@ -384,7 +387,7 @@ public class GameGrid : MonoBehaviour
 			}
 
 			GameBlock toPlace = UtilityFunctionLibrary.SpliceRandom(ref blocks);
-			playGrid[i] = Instantiate(toPlace, transform);
+			playGrid[i] = Instantiate(toPlace, BlocksRoot);
 			playGrid[i].Move(i);
 
 			MarkBlockDirty(playGrid[i]);
@@ -407,7 +410,7 @@ public class GameGrid : MonoBehaviour
 			}
 
 			GameBlock toPlace = UtilityFunctionLibrary.SpliceRandom(ref blocks);
-			playGrid[i] = Instantiate(toPlace, transform);
+			playGrid[i] = Instantiate(toPlace, BlocksRoot);
 			playGrid[i].Move(i);
 
 			MarkBlockDirty(playGrid[i]);
@@ -436,10 +439,25 @@ public class GameGrid : MonoBehaviour
 		gameSelector.gameObject.SetActive(false);
 
 		raiseUp = false;
-		StartCoroutine(KillBlocks());
 
-		MasterManager.instance.DatabaseHandler.PostScore(score, null);
+        BlocksRoot.gameObject.DeleteChildren();
+
+        DatabaseHandler.Get().PostScore(score, null);
+        PanelManager.Get().ChangePanels(EGameScreens.GS_MainMenu);
+        MasterManager.instance.ChangeGameState(EGameState.GS_Menu);
 	}
+
+    void Reset()
+    {
+        raiseCounter = 0;
+        score = 0;
+        chain = 0;
+
+        gameSelector.gameObject.SetActive(true);
+        gameSelector.Index = width;
+
+        PlaceStartingBlocks();
+    }
 
 	IEnumerator KillBlocks()
 	{

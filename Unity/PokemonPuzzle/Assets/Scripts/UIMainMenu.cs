@@ -21,7 +21,12 @@ public class UIMainMenu : MonoBehaviour
 
     public void HighscoresPressed()
     {
+        PanelManager.Get().ChangePanels(EGameScreens.GS_ViewHighscores);
+    }
 
+    public void FriendsPressed()
+    {
+        PanelManager.Get().ShowPanel(EGameScreens.GS_FriendsList);
     }
 
     public void LogoutPressed()

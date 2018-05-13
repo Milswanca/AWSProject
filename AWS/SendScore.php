@@ -16,7 +16,8 @@
 		trigger_error("Failed to verify account", E_USER_WARNING);
 	}
 
-	$sql = "INSERT INTO Highscores SET Username = '$login', Score = $score;";
+	$sql = "INSERT INTO Highscores (Username, Score) Values ('$accountName', $score)
+	ON DUPLICATE KEY UPDATE Score = $score;";
 				  
 	$result = SafeQuery($pdo, $sql);
 ?>

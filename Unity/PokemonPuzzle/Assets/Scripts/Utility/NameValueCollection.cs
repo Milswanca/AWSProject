@@ -60,4 +60,9 @@ public class NameValueCollection
 
         return false;
     }
+
+    public bool DoesValueExist(string _name)
+    {
+        return nameValueMap.ContainsKey(_name);
+    }
 }

@@ -31,8 +31,11 @@ public class DatabaseHandler : MonoBehaviour
     private static string SendScoreURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/SendScore.php?";
     private static string CreateAccountURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/CreateAccount.php?";
     private static string LoginURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/Login.php?";
+    private static string AddFriendURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/AddFriend.php?";
     private static string ChangePasswordURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/ChangePassword.php?";
     private static string GetProfileURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/GetProfile.php?";
+    private static string GetHighscoresURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/GetHighscores.php?";
+    private static string GetFriendsURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/GetFriends.php?";
     private static string UpdateProfileURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/UpdateProfile.php?";
     private static string PrivateKey = "pm36YVRuGh";
 
@@ -152,6 +155,36 @@ public class DatabaseHandler : MonoBehaviour
     private void OnRetrievedMyProfile(bool _success, ErrorResult _error, NameValueCollection _nameValueCollection)
     {
         cachedProfileInfo = _nameValueCollection;
+    }
+
+    public void GetHighscores(bool _friendsOnly, CollectionReturn _finishedEvent)
+    {
+        string scope = (_friendsOnly) ? "Friends" : "Global";
+        string url = GetHighscoresURL + "Username=" + WWW.EscapeURL(Username) + "&Scope=" + scope;
+        AddHashToURL(ref url, Username + scope);
+
+        StartCoroutine(CollectionRoutine(url, new CollectionReturn[] { _finishedEvent }));
+    }
+
+    public void GetFriends(string _player, CollectionReturn _finishedEvent)
+    {
+        string url = GetFriendsURL + "&FromUser=" + _player;
+        AddHashToURL(ref url, _player);
+
+        StartCoroutine(CollectionRoutine(url, new CollectionReturn[] { _finishedEvent }));
+    }
+
+    public void GetMyFriends(CollectionReturn _finishedEvent)
+    {
+        GetFriends(Username, _finishedEvent);
+    }
+
+    public void AddFriend(string _friendName, SuccessFailReturn _finishedEvent)
+    {
+        string url = AddFriendURL + "Username=" + WWW.EscapeURL(Username) + "&Password=" + Password + "&Friend=" + _friendName;
+        AddHashToURL(ref url, Username + Password + _friendName);
+
+        StartCoroutine(SuccessFailRoutine(url, new SuccessFailReturn[] { _finishedEvent }));
     }
 
     //Routine for all success or fail HTTP callbacks
