@@ -11,21 +11,12 @@
 
 	//Could most definitely be optimised but is fine for our uses
 	//Pending
-	$sqlPending = "SELECT Requester FROM Friends
-	WHERE Requestee = '$me' AND Accepted = 0";
-
-	//Unaccepted
-	$sqlUnaccepted = "SELECT Requestee FROM Friends
+	$sqlPending = "SELECT Requestee FROM Friends
 	WHERE Requester = '$me' AND Accepted = 0";
 
-	//Friends
-	$sqlFriends = 
-	"SELECT CASE
-    	WHEN Requestee = '$me' THEN Requester
-    	WHEN Requester = '$me' THEN Requestee
-	END 
-	FROM Friends
-	WHERE Accepted = 1 AND ('$me' = Requestee OR '$me' = Requester)";
+	//Unaccepted
+	$sqlUnaccepted = "SELECT Requester FROM Friends
+	WHERE Requestee = '$me' AND Accepted = 0";
 	 
 	//Return pending
 	$result = SafeQuery($pdo, $sqlPending);
@@ -44,10 +35,9 @@
 	}
 
 	//Return friends
-	$result = SafeQuery($pdo, $sqlFriends);
-	$pending = $result->fetchAll();
-	for($i = 0; $i < Count($pending); $i += 1)
+	$result = GetFriends($me, $pdo);
+	for($i = 0; $i < Count($result); $i += 1)
 	{
-		echo "&Friends".$i."=".$pending[$i][0];
+		echo "&Friends".$i."=".$result[$i];
 	}
 ?>

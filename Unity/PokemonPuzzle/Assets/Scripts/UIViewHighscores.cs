@@ -57,7 +57,7 @@ public class UIViewHighscores : MonoBehaviour
 
     public void ShowFriends()
     {
-
+        DatabaseHandler.Get().GetHighscores(true, RetrievedHighscores);
     }
 
     public void Close()

@@ -41,4 +41,26 @@
 	{
 		return isset($_GET[$arg]) ? $_GET[$arg] : null;
 	}
+
+	function GetFriends($user, $pdo)
+	{
+		$sqlFriends = 
+		"SELECT CASE
+			WHEN Requestee = '$user' THEN Requester
+			WHEN Requester = '$user' THEN Requestee
+		END 
+		FROM Friends
+		WHERE Accepted = 1 AND ('$user' = Requestee OR '$user' = Requester)";
+
+		//Return friends
+		$result = SafeQuery($pdo, $sqlFriends);
+		$pending = $result->fetchAll();
+		$friends = array();
+		for($i = 0; $i < Count($pending); $i += 1)
+		{
+			array_push($friends, $pending[$i][0]);
+		}
+
+		return $friends;
+	}
 ?>

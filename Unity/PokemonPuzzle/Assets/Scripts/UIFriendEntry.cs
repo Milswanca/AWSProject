@@ -20,7 +20,9 @@ public class UIFriendEntry : MonoBehaviour
     public string FriendName { get; private set; }
     public EFriendRequestType RequestType { get; private set; }
 
-    public void Init(string _name, EFriendRequestType _type)
+    private UIFriendsList friendsList = null;
+
+    public void Init(string _name, EFriendRequestType _type, UIFriendsList _friendsList)
     {
         FriendName = _name;
         FriendText.text = _name;
@@ -38,6 +40,8 @@ public class UIFriendEntry : MonoBehaviour
                 FriendRoot.SetActive(true);
                 break;
         }
+
+        friendsList = _friendsList;
     }
 
     public void Accept()
@@ -47,7 +51,7 @@ public class UIFriendEntry : MonoBehaviour
             return;
         }
 
-        //accept
+        friendsList.FriendAccepted(FriendName);
     }
 
     public void Decline()
@@ -57,7 +61,7 @@ public class UIFriendEntry : MonoBehaviour
             return;
         }
 
-        //Decline
+        friendsList.FriendDeclined(FriendName);
     }
 
     public void ViewProfile()
@@ -72,13 +76,13 @@ public class UIFriendEntry : MonoBehaviour
 
         if (_success)
         {
-            string username = _collection.GetString("Username");
-            string greeting = _collection.GetString("Greeting");
-            int dp = _collection.GetInt("DisplayPic");
+            UIViewProfile profileView = PanelManager.Get().GetScreen(EGameScreens.GS_ViewProfile).PanelContent.GetComponent<UIViewProfile>();
 
-            Sprite dpSprite = MasterManager.instance.GetProfileSprite(dp);
-
-            PopupManager.Get().QueuePopup(EPopupTypes.ViewProfile, new ViewProfilePopup.Data(username, greeting, dpSprite));
+            if (profileView)
+            {
+                profileView.SetProfile(new ProfileData(_collection));
+                PanelManager.Get().ShowPanel(EGameScreens.GS_ViewProfile);
+            }
         }
     }
 }

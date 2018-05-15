@@ -5,28 +5,6 @@ using UnityEngine.UI;
 
 public class UIEditProfile : MonoBehaviour
 {
-    private struct ProfileData
-    {
-        public ProfileData(int _displayPic, string _greeting)
-        {
-            DisplayPic = _displayPic;
-            Greeting = _greeting;
-        }
-
-        public int DisplayPic;
-        public string Greeting;
-
-        public static bool operator == (ProfileData _me, ProfileData _other)
-        {
-            return _me.Greeting == _other.Greeting && _me.DisplayPic == _other.DisplayPic;
-        }
-
-        public static bool operator != (ProfileData _me, ProfileData _other)
-        {
-            return !(_other == _me);
-        }
-    }
-
     [SerializeField]
     InputField greeting;
 
@@ -39,6 +17,12 @@ public class UIEditProfile : MonoBehaviour
     private Sprite[] possibleDisplayPics;
     private ProfileData defaultProfileData;
     private ProfileData newProfileData;
+
+    private void Awake()
+    {
+        defaultProfileData = new ProfileData("", 0, "");
+        newProfileData = new ProfileData("", 0, "");
+    }
 
     private void OnEnable()
     {
@@ -54,13 +38,10 @@ public class UIEditProfile : MonoBehaviour
         {
             username.text = _params.GetString("Username");
 
-            string greeting = _params.GetString("Greeting");
-            int dp = _params.GetInt("DisplayPic");
+            defaultProfileData = new ProfileData(_params);
 
-            defaultProfileData = new ProfileData(dp, greeting);
-
-            SetDisplayPic(dp);
-            SetGreeting(greeting);
+            SetDisplayPic(defaultProfileData.DisplayPic);
+            SetGreeting(defaultProfileData.Greeting);
         }
     }
 

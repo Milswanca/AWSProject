@@ -21,6 +21,14 @@ public class NameValueCollection
         nameValueMap.Add(_name, _value);
     }
 
+    public void Remove(string _name)
+    {
+        if(nameValueMap.ContainsKey(_name))
+        {
+            nameValueMap.Remove(_name);
+        }
+    }
+
     public int GetInt(string _name)
     {
         if(nameValueMap.ContainsKey(_name))

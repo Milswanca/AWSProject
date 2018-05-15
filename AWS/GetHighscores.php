@@ -15,7 +15,11 @@
 
 	if($scope == "Friends")
 	{
-		
+		$sql = "SELECT * 
+		FROM Highscores 
+		INNER JOIN Friends ON (Highscores.Username = Friends.Requestee OR Highscores.Username = Friends.Requester) 
+		WHERE Accepted = 1
+		ORDER BY Score DESC LIMIT 10";
 	}
 	else
 	{

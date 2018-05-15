@@ -20,6 +20,7 @@ public class DatabaseHandler : MonoBehaviour
 
     public delegate void SuccessFailReturn(bool success, ErrorResult message);
     public delegate void CollectionReturn(bool success, ErrorResult message, NameValueCollection collection);
+    public delegate void ProfileDataReturn(bool success, ErrorResult message, ProfileDataReturn collection);
 
     public static bool LoggedIn { get; private set; }
     public static string Username { get; private set; }
@@ -37,6 +38,7 @@ public class DatabaseHandler : MonoBehaviour
     private static string GetHighscoresURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/GetHighscores.php?";
     private static string GetFriendsURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/GetFriends.php?";
     private static string UpdateProfileURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/UpdateProfile.php?";
+    private static string RemoveFriendURL = "puzzledserver-env4.us-west-2.elasticbeanstalk.com/RemoveFriendRequest.php?";
     private static string PrivateKey = "pm36YVRuGh";
 
     public static DatabaseHandler Get()
@@ -182,6 +184,14 @@ public class DatabaseHandler : MonoBehaviour
     public void AddFriend(string _friendName, SuccessFailReturn _finishedEvent)
     {
         string url = AddFriendURL + "Username=" + WWW.EscapeURL(Username) + "&Password=" + Password + "&Friend=" + _friendName;
+        AddHashToURL(ref url, Username + Password + _friendName);
+
+        StartCoroutine(SuccessFailRoutine(url, new SuccessFailReturn[] { _finishedEvent }));
+    }
+
+    public void RemoveFriend(string _friendName, SuccessFailReturn _finishedEvent)
+    {
+        string url = RemoveFriendURL + "Username=" + WWW.EscapeURL(Username) + "&Password=" + Password + "&Friend=" + _friendName;
         AddHashToURL(ref url, Username + Password + _friendName);
 
         StartCoroutine(SuccessFailRoutine(url, new SuccessFailReturn[] { _finishedEvent }));

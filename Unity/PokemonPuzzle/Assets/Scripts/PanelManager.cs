@@ -71,6 +71,7 @@ public class PanelManager : MonoBehaviour
             return;
         }
 
+        _panel.Manager = this;
         screenMap[_panel.GameScreenID] = _panel;
     }
 

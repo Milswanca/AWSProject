@@ -17,6 +17,11 @@ public class UIFriendsList : MonoBehaviour
     [SerializeField]
     GameObject FriendEntryPrefab;
 
+    [SerializeField]
+    InputField FriendInput;
+
+    private NameValueCollection cachedFriendsList = null;
+
     private void OnEnable()
     {
         RefreshFriendsList();
@@ -32,7 +37,7 @@ public class UIFriendsList : MonoBehaviour
         while(_collection.DoesValueExist("Pending" + index))
         {
             UIFriendEntry entry = Instantiate(FriendEntryPrefab, PendingRoot.transform).GetComponent<UIFriendEntry>();
-            entry.Init(_collection.GetString("Pending" + index), EFriendRequestType.FRT_Pending);
+            entry.Init(_collection.GetString("Pending" + index), EFriendRequestType.FRT_Pending, this);
             index++;
         }
 
@@ -40,7 +45,7 @@ public class UIFriendsList : MonoBehaviour
         while (_collection.DoesValueExist("Unaccepted" + index))
         {
             UIFriendEntry entry = Instantiate(FriendEntryPrefab, UnacceptedRoot.transform).GetComponent<UIFriendEntry>();
-            entry.Init(_collection.GetString("Unaccepted" + index), EFriendRequestType.FRT_Unaccepted);
+            entry.Init(_collection.GetString("Unaccepted" + index), EFriendRequestType.FRT_Unaccepted, this);
             index++;
         }
 
@@ -48,9 +53,11 @@ public class UIFriendsList : MonoBehaviour
         while (_collection.DoesValueExist("Friends" + index))
         {
             UIFriendEntry entry = Instantiate(FriendEntryPrefab, FriendsRoot.transform).GetComponent<UIFriendEntry>();
-            entry.Init(_collection.GetString("Friends" + index), EFriendRequestType.FRT_Friend);
+            entry.Init(_collection.GetString("Friends" + index), EFriendRequestType.FRT_Friend, this);
             index++;
         }
+
+        cachedFriendsList = _collection;
     }
 
     public void ClearFriendsList()
@@ -79,5 +86,22 @@ public class UIFriendsList : MonoBehaviour
     public void Close()
     {
         PanelManager.Get().ChangePanels(EGameScreens.GS_MainMenu);
+    }
+
+    public void AddFriendPressed()
+    {
+        DatabaseHandler.Get().AddFriend(FriendInput.text, (bool success, DatabaseHandler.ErrorResult s) => { if (success) { RefreshFriendsList(); } });
+
+        FriendInput.text = "";
+    }
+
+    public void FriendAccepted(string _friendName)
+    {
+        DatabaseHandler.Get().AddFriend(_friendName, (bool success, DatabaseHandler.ErrorResult s) => { if (success) { RefreshFriendsList(); } });
+    }
+
+    public void FriendDeclined(string _friendName)
+    {
+        DatabaseHandler.Get().RemoveFriend(_friendName, (bool success, DatabaseHandler.ErrorResult s) => { if (success) { RefreshFriendsList(); } });
     }
 }

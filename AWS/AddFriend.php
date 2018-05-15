@@ -1,42 +1,53 @@
 <?php
-	require_once('Connect.php');
-	require_once('Login.php');
+	require_once('Puzzled.php');
 	
-	$friend = GetArg('Friend');
-	$hash = GetArg('Hash');
+	$accountName = GetArg('Username');
+	$accountPass = GetArg('Password');
+	$friend 	 = GetArg('Friend');
+	$hash 		 = GetArg('Hash');
 
-	if(!CheckHash($accountUser . $accountPass . $friend, $hash))
+	if(!CheckHash($accountName . $accountPass . $friend, $hash))
 	{
 		trigger_error("Incorrect Hash", E_USER_WARNING);
 	}
 
+	if(!CheckLogin($accountName, $accountPass, $pdo))
+	{
+		trigger_error("Failed to verify account", E_USER_WARNING);
+	}
+
 	if(!DoesUserExist($friend, $pdo))
 	{
+		//Delete the request
+		$sql = "DELETE FROM Friends WHERE (Requestee = '$accountName' AND Requester = '$friend') OR (Requestee = '$friend' AND Requester = '$accountName')";
+		SafeQuery($pdo, $sql);
+
+		//Error
 		trigger_error("User does not Exist", E_USER_WARNING);
 	}
 	
 	//Check for an existing request
 	$sqlCheckExisting = "SELECT * FROM Friends 
-	WHERE Requester = '$friend' AND Requestee = '$accountUser'";
+	WHERE Requester = '$friend' AND Requestee = '$accountName'";
 	
 	$result = SafeQuery($pdo, $sqlCheckExisting);
-	$rows = $result->fetch_all();
+	$rows = $result->fetchAll();
 
-	if(Count($result) > 0)
+	if(Count($rows) > 0)
 	{
 		//Update Friends if existing request is valid
 		$sqlUpdateExisting = "UPDATE Friends
 		SET Accepted = 1
-		WHERE Requester = '$friend' AND Requestee = '$accountUser'";
+		WHERE Requester = '$friend' AND Requestee = '$accountName'";
 
-		$result = SafeQuery($pdo, $sqlUpdateExisting);
+		SafeQuery($pdo, $sqlUpdateExisting);
 	}
 	else
 	{
 		//New Friend Request
 		$sqlNewRequest = "INSERT INTO Friends(Requestee, Requester, Accepted)
-		VALUES ('$friend', '$accountUser', 0)";
+		VALUES ('$friend', '$accountName', 0)";
 
-		$result = SafeQuery($pdo, $sqlNewRequest);
+		SafeQuery($pdo, $sqlNewRequest);
 	}
 ?>

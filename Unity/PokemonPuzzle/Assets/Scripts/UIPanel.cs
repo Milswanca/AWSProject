@@ -7,8 +7,12 @@ public class UIPanel : MonoBehaviour
     public EGameScreens GameScreenID;
     protected bool IsScreenActive = false;
 
+    public PanelManager Manager { get; set; }
+
     [SerializeField]
     GameObject panelContent;
+
+    public GameObject PanelContent { get { return panelContent; } }
 
     private void Awake()
     {
