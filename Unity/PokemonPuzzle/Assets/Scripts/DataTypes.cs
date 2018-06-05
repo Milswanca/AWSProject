@@ -21,7 +21,8 @@ public enum EGameScreens
     GS_EditProfile,
     GS_ViewHighscores,
     GS_FriendsList,
-    GS_ViewProfile
+    GS_ViewProfile,
+    GS_ChangePassword
 }
 
 public enum EGameState

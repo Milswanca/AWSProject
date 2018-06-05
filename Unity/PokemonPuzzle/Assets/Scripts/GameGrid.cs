@@ -135,6 +135,9 @@ public class GameGrid : MonoBehaviour
 
 	public void MakeMove(int _swapIndex, int _withIndex)
 	{
+        if(!AreIndexsOnSameRow(_swapIndex, _withIndex)) { return; }
+        if(Index1DTo2D(_swapIndex).y == 0 || Index1DTo2D(_withIndex).y == 0) { return; }
+
 		GameBlock swap = GetGameBlock(_swapIndex);
 		GameBlock with = GetGameBlock(_withIndex);
 
@@ -436,15 +439,9 @@ public class GameGrid : MonoBehaviour
 
 	void GameOver()
 	{
-		gameSelector.gameObject.SetActive(false);
-
-		raiseUp = false;
-
-        BlocksRoot.gameObject.DeleteChildren();
-
-        DatabaseHandler.Get().PostScore(score, null);
-        PanelManager.Get().ChangePanels(EGameScreens.GS_MainMenu);
-        MasterManager.instance.ChangeGameState(EGameState.GS_Menu);
+        raiseUp = false;
+        gameSelector.gameObject.SetActive(false);
+        StartCoroutine(KillBlocks());
 	}
 
     void Reset()
@@ -452,6 +449,9 @@ public class GameGrid : MonoBehaviour
         raiseCounter = 0;
         score = 0;
         chain = 0;
+
+        uiGame.SetTextScore(score);
+        uiGame.SetTextChain(chain);
 
         gameSelector.gameObject.SetActive(true);
         gameSelector.Index = width;
@@ -469,7 +469,28 @@ public class GameGrid : MonoBehaviour
 				yield return new WaitForEndOfFrame();
 			}
 		}
+
+        yield return new WaitForSeconds(2.0f);
+
+        OnAllBlocksKilled();
 	}
+
+    void OnAllBlocksKilled()
+    {
+        DatabaseHandler.Get().PostScore(score, ScorePosted);
+    }
+
+    void ScorePosted(bool _success, DatabaseHandler.ErrorResult _error)
+    {
+        ReturnToMenu();
+    }
+
+    void ReturnToMenu()
+    {
+        BlocksRoot.gameObject.DeleteChildren();
+        PanelManager.Get().ChangePanels(EGameScreens.GS_ViewHighscores);
+        MasterManager.instance.ChangeGameState(EGameState.GS_Menu);
+    }
 
 	public GameBlock GetGameBlock(int _index)
 	{
@@ -496,12 +517,30 @@ public class GameGrid : MonoBehaviour
 		return _index - width;
 	}
 
-	public Vector3 GetWorldPositionOfIndex(int _index)
-	{
-		return new Vector3((_index % width) * gridSpaceSize, ((_index / width) * gridSpaceSize) + raisedOffset, 0);
-	}
+    public Vector3 GetWorldPositionOfIndex(int _index)
+    {
+        return new Vector3((_index % width) * gridSpaceSize, ((_index / width) * gridSpaceSize) + raisedOffset, 0);
+    }
 
-	public bool AreIndexsOnSameRow(int _indexA, int _indexB)
+    public int GetIndexFromWorldPosition(Vector3 _pos)
+    {
+        _pos.x += gridSpaceSize * 0.5f;
+        _pos.y += -raisedOffset + (gridSpaceSize * 0.5f);
+        int x = Mathf.FloorToInt(_pos.x / gridSpaceSize);
+        int y = Mathf.FloorToInt(_pos.y / gridSpaceSize);
+        return Index2DTo1D(new Vector2Int(x, y));
+    }
+
+    public Vector2Int GetIndex2DFromWorldPosition(Vector3 _pos)
+    {
+        _pos.x += gridSpaceSize * 0.5f;
+        _pos.y += -raisedOffset + (gridSpaceSize * 0.5f);
+        int x = Mathf.FloorToInt(_pos.x / gridSpaceSize);
+        int y = Mathf.FloorToInt(_pos.y / gridSpaceSize);
+        return new Vector2Int(x, y);
+    }
+
+    public bool AreIndexsOnSameRow(int _indexA, int _indexB)
 	{
 		return _indexA / width == _indexB / width;
 	}

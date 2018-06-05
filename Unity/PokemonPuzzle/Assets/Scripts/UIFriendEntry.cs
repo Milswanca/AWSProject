@@ -70,6 +70,7 @@ public class UIFriendEntry : MonoBehaviour
         DatabaseHandler.Get().GetProfileInfo(FriendName, ViewProfileRetrieved);
     }
 
+    //Show profile
     private void ViewProfileRetrieved(bool _success, DatabaseHandler.ErrorResult _error, NameValueCollection _collection)
     {
         UICanvas.Get().TurnOffDarkenator();

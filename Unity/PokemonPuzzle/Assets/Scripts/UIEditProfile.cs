@@ -88,4 +88,9 @@ public class UIEditProfile : MonoBehaviour
         newProfileData.DisplayPic = _displayPic;
         displayPic.sprite = possibleDisplayPics[_displayPic];
     }
+
+    public void ChangePassword()
+    {
+        PanelManager.Get().ShowPanel(EGameScreens.GS_ChangePassword);
+    }
 }

@@ -25,6 +25,7 @@ public class DatabaseHandler : MonoBehaviour
     public static bool LoggedIn { get; private set; }
     public static string Username { get; private set; }
     private static string Password;
+    private static string cachedPendingPassword;
 
     private static NameValueCollection cachedProfileInfo = null;
     private static NameValueCollection pendingProfileInfo = null;
@@ -100,14 +101,24 @@ public class DatabaseHandler : MonoBehaviour
     //Changes account password
     //@_newPassword: New account password
     //@_finishedEvent: Password change Callback
-    public void ChangePassword(string _newPassword, SuccessFailReturn _finishedEvent)
+    public void ChangePassword(string _oldPassword, string _newPassword, SuccessFailReturn _finishedEvent)
     {
-        string url = ChangePasswordURL + "Username=" + WWW.EscapeURL(Username) + "&Password=" + Password + "&NewPassword=" + _newPassword;
-        AddHashToURL(ref url, Username + Password + _newPassword);
+        cachedPendingPassword = _newPassword;
 
-        StartCoroutine(SuccessFailRoutine(url, new SuccessFailReturn[] { _finishedEvent }));
+        string url = ChangePasswordURL + "Username=" + WWW.EscapeURL(Username) + "&Password=" + _oldPassword + "&NewPassword=" + _newPassword;
+        AddHashToURL(ref url, Username + _oldPassword + _newPassword);
+
+        StartCoroutine(SuccessFailRoutine(url, new SuccessFailReturn[] { OnPasswordChanged, _finishedEvent }));
     }
 
+    void OnPasswordChanged(bool _success, ErrorResult _error)
+    {
+        if(_success)
+        {
+            Password = cachedPendingPassword;
+        }
+    }
+    
     public void GetProfileInfo(string _playerName, CollectionReturn _finishedEvent)
     {
         if(_playerName == null)
